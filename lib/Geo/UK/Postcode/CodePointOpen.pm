@@ -56,7 +56,7 @@ sub _build_metadata {
 
     return {
         author => $author,
-        ( map { split /:/ } @headers ),
+        ( map { split /\s*:\s*/ } @headers ),
         counts =>
             { map { /\s+([A-Z]{1,2})\t(\d+)/ ? ( $1, $2 ) : () } @counts },
     };
