@@ -1,0 +1,76 @@
+NAME
+    Geo::UK::Postcode::CodePointOpen - Utility object to extract OS
+    Code-Point Open data for British Postcodes
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use Geo::UK::Postcode::CodePointOpen;
+
+        my $code_point_open = Geo::UK::Postcode::CodePointOpen->new( path => ... );
+
+        my $metadata = $code_point_open->metadata();
+
+        my $iterator = $code_point_open->read_iterator();
+        while (my $pc = $iterator->()) {
+            ...
+        }
+
+DESCRIPTION
+    Util object to read OS Code-Point Open data.
+
+ATTRIBUTES
+  path
+    Set at construction to the directory containing the contents of the OS
+    Code-Point Open Zip file.
+
+  doc_dir, data_dir
+    Path::Tiny objects for the documentation and CSV data directories.
+
+  metadata
+    Hashref parsed from the "Doc/metadata.txt" file. Contains postcode
+    counts per area, date data generated, etc.
+
+METHODS
+  new
+        my $code_point_open = Geo::UK::Postcode::CodePointOpen->new(
+            path => ...,    # path to Unzipped Code-Point Open directory
+        );
+
+    Constructor.
+
+  read_iterator
+        my $iterator = $code_point_open->read_iterator(
+            short_column_names => 1,    # default is false (long names)
+            include_lat_long   => 1,    # default is false
+            split_postcode     => 1,    # split into outcode/incode
+        );
+
+    Returns a coderef iterator. Call repeatedly to get a hashref of data for
+    each postcode in data files.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen>
+
+      git clone https://github.com/mjemmeson/Geo-UK-Postcode-CodePointOpen.git
+
+AUTHOR
+    Michael Jemmeson <mjemmeson@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Michael Jemmeson
+    <mjemmeson@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

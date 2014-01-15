@@ -16,7 +16,7 @@ my $pc_re = Geo::UK::Postcode::Regex->strict_regex;
 has path => ( is => 'ro', isa => Dir, coerce => Dir->coercion );
 has column_headers => ( is => 'lazy' );
 has csv            => ( is => 'lazy' );
-has metadata => (is => 'lazy');
+has metadata       => ( is => 'lazy' );
 
 sub _build_column_headers {
     my $self = shift;
@@ -36,12 +36,12 @@ sub _build_csv {
     return $csv;
 }
 
-# ORDNANCE SURVEY
-# PRODUCT: OS CODE-POINT_OPEN
-# DATASET VERSION NUMBER: 2013.4.0
-# COPYRIGHT DATE: 20131027
-# RM UPDATE DATE: 20131018
-#       AB\t16644
+# <author>
+# PRODUCT: <product>
+# DATASET VERSION NUMBER: <version>
+# COPYRIGHT DATE: <YYYYMMDD>
+# RM UPDATE DATE: <YYYYMMDD>
+#       XX\t123
 sub _build_metadata {
     my $self = shift;
 
@@ -177,9 +177,7 @@ sub read_iterator {
             my ( $area, $district, $sector, $unit )
                 = eval { $row->[0] =~ $pc_re };
 
-            if ( $@
-                || !( $area && defined $district && defined $sector && $unit ) )
-            {
+            if ( $@ || !$unit ) {
                 die "Unable to parse '"
                     . $row->[0]
                     . "' : Please report via "
