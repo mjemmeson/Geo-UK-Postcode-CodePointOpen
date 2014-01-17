@@ -17,6 +17,9 @@ SYNOPSIS
             ...
         }
 
+        # Just access data files (as Path::Tiny objects)
+        my @data_files = sort $self->data_dir->children(qr/\.csv$/);
+
 DESCRIPTION
     Util object to read OS Code-Point Open data.
 
