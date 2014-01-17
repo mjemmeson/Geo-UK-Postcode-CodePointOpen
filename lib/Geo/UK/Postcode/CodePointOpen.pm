@@ -55,7 +55,7 @@ sub _build_metadata {
     my @counts  = grep {/\t/} @lines;
 
     return {
-        author => $author,
+        AUTHOR => $author,
         ( map { split /\s*:\s*/ } @headers ),
         counts =>
             { map { /\s+([A-Z]{1,2})\t(\d+)/ ? ( $1, $2 ) : () } @counts },
@@ -69,63 +69,6 @@ sub doc_dir {
 sub data_dir {
     shift->path->child('Data/CSV');
 }
-
-
-=head1 SYNOPSIS
-
-    use Geo::UK::Postcode::CodePointOpen;
-
-    my $code_point_open = Geo::UK::Postcode::CodePointOpen->new( path => ... );
-
-    my $metadata = $code_point_open->metadata();
-
-    my $iterator = $code_point_open->read_iterator();
-    while (my $pc = $iterator->()) {
-        ...
-    }
-
-=head1 DESCRIPTION
-
-Util object to read OS Code-Point Open data.
-
-=head1 ATTRIBUTES
-
-=head2 path
-
-Set at construction to the directory containing the contents of the OS
-Code-Point Open Zip file.
-
-=head2 doc_dir, data_dir
-
-L<Path::Tiny> objects for the documentation and CSV data directories.
-
-=head2 metadata
-
-Hashref parsed from the C<Doc/metadata.txt> file. Contains postcode counts
-per area, date data generated, etc.
-
-=head1 METHODS
-
-=head2 new
-
-    my $code_point_open = Geo::UK::Postcode::CodePointOpen->new(
-        path => ...,    # path to Unzipped Code-Point Open directory
-    );
-
-Constructor.
-
-=head2 read_iterator
-
-    my $iterator = $code_point_open->read_iterator(
-        short_column_names => 1,    # default is false (long names)
-        include_lat_long   => 1,    # default is false
-        split_postcode     => 1,    # split into outcode/incode
-    );
-
-Returns a coderef iterator. Call repeatedly to get a hashref of data for each
-postcode in data files.
-
-=cut
 
 sub read_iterator {
     my ( $self, %args ) = @_;
@@ -196,4 +139,63 @@ sub read_iterator {
 }
 
 1;
+
+=head1 SYNOPSIS
+
+    use Geo::UK::Postcode::CodePointOpen;
+
+    my $code_point_open = Geo::UK::Postcode::CodePointOpen->new( path => ... );
+
+    my $metadata = $code_point_open->metadata();
+
+    my $iterator = $code_point_open->read_iterator();
+    while (my $pc = $iterator->()) {
+        ...
+    }
+
+    # Just access data files (as Path::Tiny objects)
+    my @data_files = sort $self->data_dir->children(qr/\.csv$/);
+
+=head1 DESCRIPTION
+
+Util object to read OS Code-Point Open data.
+
+=head1 ATTRIBUTES
+
+=head2 path
+
+Set at construction to the directory containing the contents of the OS
+Code-Point Open Zip file.
+
+=head2 doc_dir, data_dir
+
+L<Path::Tiny> objects for the documentation and CSV data directories.
+
+=head2 metadata
+
+Hashref parsed from the C<Doc/metadata.txt> file. Contains postcode counts
+per area, date data generated, etc.
+
+=head1 METHODS
+
+=head2 new
+
+    my $code_point_open = Geo::UK::Postcode::CodePointOpen->new(
+        path => ...,    # path to Unzipped Code-Point Open directory
+    );
+
+Constructor.
+
+=head2 read_iterator
+
+    my $iterator = $code_point_open->read_iterator(
+        short_column_names => 1,    # default is false (long names)
+        include_lat_long   => 1,    # default is false
+        split_postcode     => 1,    # split into outcode/incode
+    );
+
+Returns a coderef iterator. Call repeatedly to get a hashref of data for each
+postcode in data files.
+
+=cut
 

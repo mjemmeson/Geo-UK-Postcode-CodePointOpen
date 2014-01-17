@@ -8,7 +8,7 @@ ok my $cpo = Geo::UK::Postcode::CodePointOpen->new( path => 'corpus' ),
 ok my $metadata = $cpo->metadata, "got metadata";
 
 my %md = (
-    'author'                 => 'ORDNANCE SURVEY',
+    'AUTHOR'                 => 'ORDNANCE SURVEY',
     'PRODUCT'                => 'OS CODE-POINT_OPEN',
     'DATASET VERSION NUMBER' => '2013.4.0',
     'COPYRIGHT DATE'         => '20131027',
