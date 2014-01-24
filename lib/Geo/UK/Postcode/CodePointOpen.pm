@@ -149,12 +149,12 @@ sub read_iterator {
     my $metadata = $code_point_open->metadata();
 
     my $iterator = $code_point_open->read_iterator();
-    while (my $pc = $iterator->()) {
-        ...
+    while ( my $pc = $iterator->() ) {
+        ...;
     }
 
     # Just access data files (as Path::Tiny objects)
-    my @data_files = sort $self->data_dir->children(qr/\.csv$/);
+    my @data_files = sort $self->data_dir->children( qr/\.csv$/ );
 
 =head1 DESCRIPTION
 
@@ -196,6 +196,16 @@ Constructor.
 
 Returns a coderef iterator. Call repeatedly to get a hashref of data for each
 postcode in data files.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Geo::UK::Postcode::Regex>
+
+=back
 
 =cut
 

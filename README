@@ -13,12 +13,12 @@ SYNOPSIS
         my $metadata = $code_point_open->metadata();
 
         my $iterator = $code_point_open->read_iterator();
-        while (my $pc = $iterator->()) {
-            ...
+        while ( my $pc = $iterator->() ) {
+            ...;
         }
 
         # Just access data files (as Path::Tiny objects)
-        my @data_files = sort $self->data_dir->children(qr/\.csv$/);
+        my @data_files = sort $self->data_dir->children( qr/\.csv$/ );
 
 DESCRIPTION
     Util object to read OS Code-Point Open data.
@@ -52,6 +52,9 @@ METHODS
 
     Returns a coderef iterator. Call repeatedly to get a hashref of data for
     each postcode in data files.
+
+SEE ALSO
+    *   Geo::UK::Postcode::Regex
 
 SUPPORT
   Bugs / Feature Requests
