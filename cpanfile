@@ -1,6 +1,7 @@
 requires "Geo::Coordinates::OSGB" => "0";
 requires "Geo::UK::Postcode::Regex" => "0";
 requires "Moo" => "0";
+requires "Path::Tiny" => "0.48";
 requires "Text::CSV" => "0";
 requires "Types::Path::Tiny" => "0";
 requires "perl" => "5.006";
@@ -25,8 +26,9 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
-  requires "Dist::Zilla" => "5.009";
+  requires "Dist::Zilla" => "5.006";
   requires "Dist::Zilla::Plugin::CopyFilesFromBuild" => "0";
+  requires "Dist::Zilla::Plugin::Prereqs" => "0";
   requires "Dist::Zilla::Plugin::RunExtraTests" => "0";
   requires "Dist::Zilla::PluginBundle::DAGOLDEN" => "0";
   requires "Dist::Zilla::PluginBundle::Filter" => "0";
