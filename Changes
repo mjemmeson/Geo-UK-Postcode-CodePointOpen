@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.002     2014-01-25 09:06:40 Europe/London
+
   - Bugfix release - prereq on Path::Tiny 0.48
 
 0.001     2014-01-24 11:57:47+00:00 Europe/London
