@@ -1,8 +1,6 @@
 package Geo::UK::Postcode::CodePointOpen;
 
-# VERSION
-
-# ABSTRACT: Utility object to extract OS Code-Point Open data for British Postcodes
+our $VERSION = '0.002';
 
 use Moo;
 use Types::Path::Tiny qw/ Dir /;
@@ -138,7 +136,34 @@ sub read_iterator {
     return $iterator;
 }
 
+sub batch_iterator {
+    my ( $self, %args ) = @_;
+
+    my $batch_size = $args{batch_size} || 100;
+
+    my $read_iterator = $self->read_iterator(%args);
+
+    return sub {
+
+        my $i = 1;
+        my @postcodes;
+
+        while ( my $pc = $read_iterator->() ) {
+            push @postcodes, $pc;
+            last if ++$i > $batch_size;
+        }
+
+        return @postcodes;
+    };
+}
+
 1;
+
+__END__
+
+=head1 NAME
+
+Geo::UK::Postcode::CodePointOpen - Utility object to extract OS Code-Point Open data for British Postcodes
 
 =head1 SYNOPSIS
 
@@ -150,6 +175,11 @@ sub read_iterator {
 
     my $iterator = $code_point_open->read_iterator();
     while ( my $pc = $iterator->() ) {
+        ...;
+    }
+
+    my $batch_iterator = $code_point_open->batch_iterator();
+    while ( my @batch = $batch_iterator->() ) {
         ...;
     }
 
@@ -194,8 +224,28 @@ Constructor.
         split_postcode     => 1,    # split into outcode/incode
     );
 
-Returns a coderef iterator. Call repeatedly to get a hashref of data for each
-postcode in data files.
+    while ( my $pc = $iterator->() ) {
+        ...
+    }
+
+Returns a coderef iterator. Call that coderef repeatedly to get a hashref of
+data for each postcode in data files.
+
+=head2 batch_iterator
+
+    my $batch_iterator = $code_point_open->batch_iterator(
+        batch_size         => 100,  # number per batch (default 100)
+        short_column_names => 1,    # default is false (long names)
+        include_lat_long   => 1,    # default is false
+        split_postcode     => 1,    # split into outcode/incode
+    );
+
+    while ( my @batch = $batch_iterator->() ) {
+        ...
+    }
+
+Returns a coderef iterator. Call that coderef repeatedly to get a list of
+postcode hashrefs.
 
 =head1 SEE ALSO
 
@@ -206,6 +256,19 @@ postcode in data files.
 L<Geo::UK::Postcode::Regex>
 
 =back
+
+=head1 AUTHOR
+
+Michael Jemmeson E<lt>mjemmeson@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2014- Michael Jemmeson
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
