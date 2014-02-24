@@ -56,9 +56,10 @@ Constructor.
 ## read\_iterator
 
     my $iterator = $code_point_open->read_iterator(
-        short_column_names => 1,    # default is false (long names)
-        include_lat_long   => 1,    # default is false
-        split_postcode     => 1,    # split into outcode/incode
+        outcodes           => [...],    # specify certain outcodes
+        short_column_names => 1,        # default is false (long names)
+        include_lat_long   => 1,        # default is false
+        split_postcode     => 1,        # split into outcode/incode
     );
 
     while ( my $pc = $iterator->() ) {
@@ -71,10 +72,11 @@ data for each postcode in data files.
 ## batch\_iterator
 
     my $batch_iterator = $code_point_open->batch_iterator(
-        batch_size         => 100,  # number per batch (default 100)
-        short_column_names => 1,    # default is false (long names)
-        include_lat_long   => 1,    # default is false
-        split_postcode     => 1,    # split into outcode/incode
+        outcodes           => [...],    # specify certain outcodes
+        batch_size         => 100,      # number per batch (default 100)
+        short_column_names => 1,        # default is false (long names)
+        include_lat_long   => 1,        # default is false
+        split_postcode     => 1,        # split into outcode/incode
     );
 
     while ( my @batch = $batch_iterator->() ) {
@@ -83,6 +85,18 @@ data for each postcode in data files.
 
 Returns a coderef iterator. Call that coderef repeatedly to get a list of
 postcode hashrefs.
+
+# data\_files
+
+    my @data_files = $code_point_open->data_files(
+        qw/ AB10 AT3 WC /
+    );
+
+Returns list of data files matching a supplied list of outcodes or data areas.
+
+NOTE - doesn't check that the outcode(s) exist within the list of returned
+files - an invalid outcode will return a matching file, provided the area
+(non-digit part of outcode) is valid.
 
 # SEE ALSO
 

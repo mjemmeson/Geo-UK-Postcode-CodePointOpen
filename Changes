@@ -2,6 +2,10 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+  [Features]
+  - restrict read_iterator and batch_iterator to certain outcodes
+  - added data_files 
+
 0.003  2014-01-31 15:46:44 GMT
 
   [Features]

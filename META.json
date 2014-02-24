@@ -27,7 +27,7 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.17",
-            "Module::Build::Tiny" : "0.030"
+            "Module::Build::Tiny" : "0.034"
          }
       },
       "develop" : {

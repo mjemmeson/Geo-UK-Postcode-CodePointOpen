@@ -7,14 +7,18 @@ use Types::Path::Tiny qw/ Dir /;
 
 use Geo::UK::Postcode::Regex;
 use Geo::Coordinates::OSGB qw/ grid_to_ll shift_ll_into_WGS84 /;
+use List::MoreUtils qw/ uniq /;
 use Text::CSV;
 
-my $pc_re = Geo::UK::Postcode::Regex->strict_regex;
-
 has path => ( is => 'ro', isa => Dir, coerce => Dir->coercion );
+has pc_re          => ( is => 'lazy' );
 has column_headers => ( is => 'lazy' );
 has csv            => ( is => 'lazy' );
 has metadata       => ( is => 'lazy' );
+
+sub _build_pc_re {
+    Geo::UK::Postcode::Regex->strict_regex;
+}
 
 sub _build_column_headers {
     my $self = shift;
@@ -68,6 +72,18 @@ sub data_dir {
     shift->path->child('Data/CSV');
 }
 
+sub data_files {
+    my ( $self, @outcodes ) = @_;
+
+    my $areas
+        = join( '|', uniq grep {$_} map { /^([A-Z]+)/i && lc $1 } @outcodes );
+
+    return sort $self->data_dir->children(
+        $areas ? qr/^(?:$areas)\.csv$/    #
+        :        qr/\.csv$/
+    );
+}
+
 sub read_iterator {
     my ( $self, %args ) = @_;
 
@@ -82,8 +98,11 @@ sub read_iterator {
         ( $out_col, $in_col )  = ( 'Outcode',  'Incode' );
     }
 
-    # Get list of data files
-    my @data_files = sort $self->data_dir->children(qr/\.csv$/);
+    my @outcodes = @{ $args{outcodes} || [] };
+    my @data_files = $self->data_files(@outcodes);
+
+    my $match = @outcodes ? join( '|', map {uc} @outcodes ) : undef;
+    $match = qr/^(?:$match)$/ if $match;
 
     # Create iterator coderef
     my $fh2;
@@ -91,46 +110,58 @@ sub read_iterator {
 
     my $iterator = sub {
 
-        unless ( $fh2 && !eof $fh2 ) {
-            my $file = shift @data_files or return;    # none left
-            $fh2 = $file->filehandle('<');
-        }
+        my %pc;
+        while (1) {
 
-        my $row = $csv->getline($fh2);
+            unless ( $fh2 && !eof $fh2 ) {
+                my $file = shift @data_files or return;    # none left
+                $fh2 = $file->filehandle('<');
+            }
 
-        my $i = 0;
-        my $pc = { map { $_ => $row->[ $i++ ] } @col_names };
+            # Expects:
+            # Postcode,Positional_quality_indicator,Eastings,Northings,...
+            my $row = $csv->getline($fh2);
 
-        if ( $args{include_lat_long} ) {
-            if ( $row->[2] && $row->[3] ) {
+            my $i = 0;
+            %pc = map { $_ => $row->[ $i++ ] } @col_names;
+
+            if ( $args{include_lat_long} && $pc{Eastings} && $pc{Northings} ) {
                 my ( $lat, $lon )
-                    = shift_ll_into_WGS84( grid_to_ll( $row->[2], $row->[3] ) );
+                    = shift_ll_into_WGS84(
+                    grid_to_ll( $pc{Eastings}, $pc{Northings} ) );
 
-                $pc->{$lat_col} = sprintf( "%.5f", $lat );
-                $pc->{$lon_col} = sprintf( "%.5f", $lon );
+                $pc{$lat_col} = sprintf( "%.5f", $lat );
+                $pc{$lon_col} = sprintf( "%.5f", $lon );
             }
+
+            if ( $args{split_postcode} || $match ) {
+
+                $pc{Postcode} =~ s/\s+/ /;
+
+                my ( $area, $district, $sector, $unit )
+                    = eval { $pc{Postcode} =~ $self->pc_re };
+
+                if ( $@ || !$unit ) {
+                    die "Unable to parse '"
+                        . $pc{Postcode}
+                        . "' : Please report via "
+                        . "https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues\n";
+
+                } else {
+
+                    next if $match && ($area . $district) !~ $match;
+
+                    if ( $args{split_postcode} ) {
+                        $pc{$out_col} = $area . $district;
+                        $pc{$in_col}  = $sector . $unit;
+                    }
+                }
+            }
+
+            last;
         }
 
-        if ( $args{split_postcode} ) {
-
-            $row->[0] =~ s/\s+/ /;
-
-            my ( $area, $district, $sector, $unit )
-                = eval { $row->[0] =~ $pc_re };
-
-            if ( $@ || !$unit ) {
-                die "Unable to parse '"
-                    . $row->[0]
-                    . "' : Please report via "
-                    . "https://github.com/mjemmeson/Geo-UK-Postcode-Regex/issues\n";
-
-            } else {
-                $pc->{$out_col} = $area . $district;
-                $pc->{$in_col}  = $sector . $unit;
-            }
-        }
-
-        return $pc;
+        return \%pc;
     };
 
     return $iterator;
@@ -219,9 +250,10 @@ Constructor.
 =head2 read_iterator
 
     my $iterator = $code_point_open->read_iterator(
-        short_column_names => 1,    # default is false (long names)
-        include_lat_long   => 1,    # default is false
-        split_postcode     => 1,    # split into outcode/incode
+        outcodes           => [...],    # specify certain outcodes
+        short_column_names => 1,        # default is false (long names)
+        include_lat_long   => 1,        # default is false
+        split_postcode     => 1,        # split into outcode/incode
     );
 
     while ( my $pc = $iterator->() ) {
@@ -234,10 +266,11 @@ data for each postcode in data files.
 =head2 batch_iterator
 
     my $batch_iterator = $code_point_open->batch_iterator(
-        batch_size         => 100,  # number per batch (default 100)
-        short_column_names => 1,    # default is false (long names)
-        include_lat_long   => 1,    # default is false
-        split_postcode     => 1,    # split into outcode/incode
+        outcodes           => [...],    # specify certain outcodes
+        batch_size         => 100,      # number per batch (default 100)
+        short_column_names => 1,        # default is false (long names)
+        include_lat_long   => 1,        # default is false
+        split_postcode     => 1,        # split into outcode/incode
     );
 
     while ( my @batch = $batch_iterator->() ) {
@@ -246,6 +279,18 @@ data for each postcode in data files.
 
 Returns a coderef iterator. Call that coderef repeatedly to get a list of
 postcode hashrefs.
+
+=head1 data_files
+
+    my @data_files = $code_point_open->data_files(
+        qw/ AB10 AT3 WC /
+    );
+
+Returns list of data files matching a supplied list of outcodes or data areas.
+
+NOTE - doesn't check that the outcode(s) exist within the list of returned
+files - an invalid outcode will return a matching file, provided the area
+(non-digit part of outcode) is valid.
 
 =head1 SEE ALSO
 
