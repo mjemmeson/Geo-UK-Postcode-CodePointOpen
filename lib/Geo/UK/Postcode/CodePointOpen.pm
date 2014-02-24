@@ -280,7 +280,7 @@ data for each postcode in data files.
 Returns a coderef iterator. Call that coderef repeatedly to get a list of
 postcode hashrefs.
 
-=head1 data_files
+=head2 data_files
 
     my @data_files = $code_point_open->data_files(
         qw/ AB10 AT3 WC /
