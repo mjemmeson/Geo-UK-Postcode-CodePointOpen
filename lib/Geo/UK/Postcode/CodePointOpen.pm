@@ -38,7 +38,7 @@ sub _build_column_headers {
 }
 
 sub _build_csv {
-    my $csv = Text::CSV->new( { binary => 1, eol => "\r\n" } )
+    my $csv = Text::CSV->new( { binary => 1 } )
         or die Text::CSV->error_diag();
     return $csv;
 }
