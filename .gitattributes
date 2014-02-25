@@ -1,0 +1,2 @@
+# OS-Code-Point-Open files have CRLF line endings
+*.csv text eol=crlf
