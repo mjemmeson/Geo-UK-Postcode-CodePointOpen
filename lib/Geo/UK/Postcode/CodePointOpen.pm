@@ -26,9 +26,14 @@ sub _build_column_headers {
     my $fh = $self->doc_dir->child('Code-Point_Open_Column_Headers.csv')
         ->filehandle('<');
 
+    my $short = $self->csv->getline($fh)
+        or die "Unable to read short column headers";
+    my $long = $self->csv->getline($fh)
+        or die "Unable to read long column headers";
+
     return {
-        short => $self->csv->getline($fh),
-        long  => $self->csv->getline($fh),
+        short => $short,
+        long  => $long
     };
 }
 
