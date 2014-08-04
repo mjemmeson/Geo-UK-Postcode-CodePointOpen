@@ -1,5 +1,6 @@
 requires "Geo::Coordinates::OSGB" => "0";
 requires "Geo::UK::Postcode::Regex" => "0";
+requires "List::MoreUtils" => "0";
 requires "Moo" => "0";
 requires "Path::Tiny" => "0.048";
 requires "Text::CSV" => "0";
