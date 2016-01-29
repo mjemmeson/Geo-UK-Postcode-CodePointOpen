@@ -1,40 +1,40 @@
-requires "Geo::Coordinates::OSGB" => "0";
-requires "Geo::UK::Postcode::Regex" => "0";
-requires "List::MoreUtils" => "0";
-requires "Moo" => "0";
+requires "Geo::Coordinates::OSGB" => "2.12";
+requires "Geo::UK::Postcode::Regex";
+requires "List::MoreUtils";
+requires "Moo";
 requires "Path::Tiny" => "0.048";
-requires "Text::CSV" => "0";
-requires "Types::Path::Tiny" => "0";
+requires "Text::CSV";
+requires "Types::Path::Tiny";
 requires "perl" => "5.006";
 
 on 'test' => sub {
-  requires "ExtUtils::MakeMaker" => "0";
-  requires "File::Spec::Functions" => "0";
-  requires "List::Util" => "0";
-  requires "Test::More" => "0";
-  requires "Test::Most" => "0";
-  requires "strict" => "0";
-  requires "warnings" => "0";
+    requires "ExtUtils::MakeMaker";
+    requires "File::Spec::Functions";
+    requires "List::Util";
+    requires "Test::More";
+    requires "Test::Most";
+    requires "strict";
+    requires "warnings";
 };
 
 on 'test' => sub {
-  recommends "CPAN::Meta" => "0";
-  recommends "CPAN::Meta::Requirements" => "0";
+    recommends "CPAN::Meta";
+    recommends "CPAN::Meta::Requirements";
 };
 
 on 'configure' => sub {
-  requires "ExtUtils::MakeMaker" => "6.17";
+    requires "ExtUtils::MakeMaker" => "6.17";
 };
 
 on 'develop' => sub {
-  requires "Dist::Milla" => "0";
-  requires "File::Spec" => "0";
-  requires "File::Temp" => "0";
-  requires "IO::Handle" => "0";
-  requires "IPC::Open3" => "0";
-  requires "Pod::Coverage::TrustPod" => "0";
-  requires "Test::CPAN::Meta" => "0";
-  requires "Test::More" => "0";
-  requires "Test::Pod" => "1.41";
-  requires "Test::Pod::Coverage" => "1.08";
+    requires "Dist::Milla";
+    requires "File::Spec";
+    requires "File::Temp";
+    requires "IO::Handle";
+    requires "IPC::Open3";
+    requires "Pod::Coverage::TrustPod";
+    requires "Test::CPAN::Meta";
+    requires "Test::More";
+    requires "Test::Pod"           => "1.41";
+    requires "Test::Pod::Coverage" => "1.08";
 };

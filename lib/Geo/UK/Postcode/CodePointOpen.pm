@@ -6,7 +6,7 @@ use Moo;
 use Types::Path::Tiny qw/ Dir /;
 
 use Geo::UK::Postcode::Regex;
-use Geo::Coordinates::OSGB qw/ grid_to_ll shift_ll_into_WGS84 /;
+use Geo::Coordinates::OSGB qw/ grid_to_ll /;
 use List::MoreUtils qw/ uniq /;
 use Text::CSV;
 
@@ -131,9 +131,7 @@ sub read_iterator {
             %pc = map { $_ => $row->[ $i++ ] } @col_names;
 
             if ( $args{include_lat_long} && $pc{Eastings} && $pc{Northings} ) {
-                my ( $lat, $lon )
-                    = shift_ll_into_WGS84(
-                    grid_to_ll( $pc{Eastings}, $pc{Northings} ) );
+                my ( $lat, $lon ) = grid_to_ll( $pc{Eastings}, $pc{Northings} );
 
                 $pc{$lat_col} = sprintf( "%.5f", $lat );
                 $pc{$lon_col} = sprintf( "%.5f", $lon );
@@ -154,7 +152,7 @@ sub read_iterator {
 
                 } else {
 
-                    next if $match && ($area . $district) !~ $match;
+                    next if $match && ( $area . $district ) !~ $match;
 
                     if ( $args{split_postcode} ) {
                         $pc{$out_col} = $area . $district;
