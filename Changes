@@ -2,6 +2,8 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.007  2017-11-14 13:26:36 GMT
+
   [Maintenance]
   - updated tests to work with latest output from Geo::Coordinates::OSGB >= 2.20
 
